@@ -12,16 +12,57 @@
     <Window.DataContext>
         <local:MainWindowVM />
     </Window.DataContext>
+    <Window.Resources>
+        <Style x:Key="tblocktyle" TargetType="TextBlock">
+            <Setter Property="Margin"
+                    Value="5" />
+            <Setter Property="Padding"
+                    Value="5" />
+            <Setter Property="FontSize"
+                    Value="18" />
+            <Setter Property="FontWeight"
+                    Value="Bold" />
+        </Style>
+        <Style x:Key="btnStyle" TargetType="Button">
+            <Setter Property="Margin"
+                    Value="5" />
+            <Setter Property="Padding"
+                    Value="7,3" />
+            <Setter Property="Width"
+                    Value="200" />
+            <Setter Property="BorderThickness"
+                    Value="2" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="FontSize"
+                    Value="16" />
+            <Setter Property="FontWeight"
+                    Value="Bold" />
+        </Style>
+        <Style x:Key="tblockGreen"
+               TargetType="TextBlock"
+               BasedOn="{StaticResource tblocktyle}">
+            <Setter Property="Foreground"
+                    Value="Green" />
+        </Style>
+        <Style x:Key="tblockRed"
+               TargetType="TextBlock"
+               BasedOn="{StaticResource tblocktyle}">
+            <Setter Property="Foreground"
+                    Value="DarkRed" />
+        </Style>
+    </Window.Resources>
+    
     <Grid Background="LightGray">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <GroupBox Header="Источник данных"
-                  Grid.Row="0">
+                  Grid.Row="0"
+                  Margin="10">
             <StackPanel Orientation="Horizontal">
                 <RadioButton Content="Ручной ввод"
                              IsChecked="{Binding IsManualSource}"
@@ -36,44 +77,106 @@
                     HorizontalAlignment="Stretch"
                     Grid.Row="1">
             <Button Name="btnAddActivity"
+                    Style="{StaticResource ResourceKey=btnStyle}"
                     Content="Добавить платеж"
                     Command="{Binding AddPaymentCommand}"
-                    Width="200"
-                    Margin="10" />
-            <ScrollViewer VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Payments}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid HorizontalAlignment="Left">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="0.2*" />
-                                    <ColumnDefinition Width="0.6*" />
-                                    <ColumnDefinition Width="0.2*" />
-                                </Grid.ColumnDefinitions>
-                                <DatePicker Name="datePicker"
-                                            Grid.Column="0"
-                                            SelectedDate="{Binding PaymentDate}"
-                                            Margin="20" />
-                                <TextBox Name="Sum"
-                                         Grid.Column="1"
-                                         Width="50"
-                                         Text="{Binding PaymentSum}"
-                                         HorizontalAlignment="Center"
-                                         VerticalAlignment="Center"
-                                         Margin="20" />
-                                <ComboBox Grid.Column="2"
-                                          ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.CurrenciesList}" 
-                                          SelectedValue="{Binding PaymentCurrency}"
-                                          Width="200"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          Margin="20"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+                    />
+            <ListView ItemsSource="{Binding Payments}"
+                      Background="LightGray"
+                      MaxHeight="600"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.CanContentScroll="True">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.2*" />
+                                <ColumnDefinition Width="0.7*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <DatePicker x:Name="datePicker"
+                                        Grid.Column="0"
+                                        SelectedDate="{Binding PaymentDate}"
+                                        Margin="20" />
+                            <TextBox x:Name="Sum"
+                                     Grid.Column="1"
+                                     Width="50"
+                                     Text="{Binding PaymentSum}"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Center"
+                                     Margin="20" />
+                            <ComboBox Grid.Column="2"
+                                      ItemsSource="{Binding DataContext.CurrenciesList, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"
+                                      SelectedValue="{Binding PaymentCurrency}"
+                                      Width="200"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Margin="20" />
+                            <Button x:Name="btnDeletePayment"
+                                    Grid.Column="3"
+                                    Content="X"
+                                    Foreground="Red"
+                                    FontWeight="Bold"
+                                    Command="{Binding DataContext.RemovePaymentCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"
+                                    CommandParameter="{Binding}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Margin="20"
+                                    Padding="5,0" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </StackPanel>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.33*" />
+                <RowDefinition Height="0.33*" />
+                <RowDefinition Height="0.33*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.3*" />
+                <ColumnDefinition Width="0.7*" />
+            </Grid.ColumnDefinitions>
+            <Button Name="btnCalculateTax"
+                    Content="Рассчитать налог"
+                    Grid.Row="0"
+                    Grid.RowSpan="3"
+                    Command="{Binding CalculateTaxCommand}"
+                    Style="{StaticResource ResourceKey=btnStyle}"/>
+            <StackPanel Grid.Row="0"
+                        Grid.Column="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center">
+                <TextBlock Style="{StaticResource ResourceKey=tblockGreen}"
+                           Text="Общий доход в нац валюте:" />
+                <TextBlock Style="{StaticResource ResourceKey=tblockGreen}"
+                           Text="{Binding TaxesResult.TotalSumUah}"
+                           Margin="5" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center">
+                <TextBlock Style="{StaticResource ResourceKey=tblockRed}"
+                        Text="Единый налог:" />
+                <TextBlock  Style="{StaticResource ResourceKey=tblockRed}"
+                            Text="{Binding TaxesResult.UnitedTax}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"
+                    Grid.Row="2"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center">
+                <TextBlock Style="{StaticResource ResourceKey=tblockRed}"
+                           Text="Военный налог:" />
+                <TextBlock Style="{StaticResource ResourceKey=tblockRed}"
+                           Text="{Binding TaxesResult.MilitaryTax}"
+                           Margin="5" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

@@ -1,7 +1,7 @@
 ﻿using Jellyfish;
 using System.Collections.ObjectModel;
-using TaxHelper.Models;
 using TaxHelper.Common;
+using TaxHelper.Models;
 using TaxHelper.Services;
 
 
@@ -11,7 +11,6 @@ namespace TaxHelper
     public class MainWindowVM : ViewModel
     {
         #region Fields
-       
         private bool _isManualSource;
         private bool _isCsvSource;
         private ObservableCollection<PaymentModel>? _payments;
@@ -23,26 +22,9 @@ namespace TaxHelper
         public MainWindowVM()
         {
             IsManualSource = true;
-            Payments = new ObservableCollection<PaymentModel>
-            {
-                new PaymentModel
-                {
-                    PaymentDate = DateTime.Now.AddDays(-10),
-                    PaymentSum = 1000,
-                    PaymentCurrency = Currencies.USD
-                },
-                new PaymentModel
-                {
-                    PaymentDate = DateTime.Now.AddDays(-2),
-                    PaymentSum = 2000,
-                    PaymentCurrency = Currencies.EUR
-                }
-            };
+            Payments = new ObservableCollection<PaymentModel>();
             CurrenciesList = Enum.GetValues(typeof(Currencies)).Cast<Currencies>().ToList();
             _taxCalculatorService = DependencyResolver.Resolve<ITaxCalculatorService>();
-
-           var taxes =  _taxCalculatorService.CalculateTax(Payments);
-
         }
         #endregion
 
@@ -75,12 +57,10 @@ namespace TaxHelper
         #endregion
 
         #region Comamnds
-
         public RelayCommand AddPaymentCommand => new RelayCommand((obj) =>
         {
-            var payment = new PaymentModel();
+            var payment = new PaymentModel { PaymentDate = DateTime.Now.AddMonths(-3) };
             Payments.Add(payment);
-
         });
 
         public RelayCommand RemovePaymentCommand => new RelayCommand((obj) =>
@@ -94,13 +74,12 @@ namespace TaxHelper
         public RelayCommand CalculateTaxCommand => new RelayCommand((obj) =>
         {
             TaxesResult = _taxCalculatorService.CalculateTax(Payments);
+            Notify(nameof(TaxesResult));
             
         });
-
         #endregion
 
         #region Methods
-
         #endregion
     }
 }
