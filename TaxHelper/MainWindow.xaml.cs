@@ -1,13 +1,6 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
+using TaxHelper.Common;
+using TaxHelper.Services;
 
 namespace TaxHelper
 {
@@ -17,8 +10,15 @@ namespace TaxHelper
     public partial class MainWindow : Window
     {
         public MainWindow()
-        {
+        { 
+            RegisterDependencies();
             InitializeComponent();
+        }
+
+        private void RegisterDependencies()
+        {
+            DependencyResolver.Register<ITaxCalculatorService>(() => new TaxCalculatorService());
+            DependencyResolver.Register<IWebClientService>(() => new WebClientService());
         }
     }
 }

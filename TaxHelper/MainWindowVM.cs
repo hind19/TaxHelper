@@ -15,7 +15,8 @@ namespace TaxHelper
         private bool _isManualSource;
         private bool _isCsvSource;
         private ObservableCollection<PaymentModel>? _payments;
-        private readonly TaxCalculatorService _taxCalculatorService;
+        private readonly ITaxCalculatorService _taxCalculatorService;
+        private TaxResultModel? _taxesResult;
         #endregion
 
         #region Ctor
@@ -26,19 +27,21 @@ namespace TaxHelper
             {
                 new PaymentModel
                 {
-                    PaymentDate = DateTime.Now.AddDays(-2),
+                    PaymentDate = DateTime.Now.AddDays(-10),
                     PaymentSum = 1000,
                     PaymentCurrency = Currencies.USD
                 },
                 new PaymentModel
                 {
-                    PaymentDate = DateTime.Now,
+                    PaymentDate = DateTime.Now.AddDays(-2),
                     PaymentSum = 2000,
                     PaymentCurrency = Currencies.EUR
                 }
             };
             CurrenciesList = Enum.GetValues(typeof(Currencies)).Cast<Currencies>().ToList();
-            _taxCalculatorService = new TaxCalculatorService();
+            _taxCalculatorService = DependencyResolver.Resolve<ITaxCalculatorService>();
+
+           var taxes =  _taxCalculatorService.CalculateTax(Payments);
 
         }
         #endregion
@@ -62,6 +65,12 @@ namespace TaxHelper
             set => Set(ref _payments, value);
         }
 
+        public TaxResultModel TaxesResult
+        {
+            get { return _taxesResult; }
+            set { _taxesResult = value; }
+        }
+
         public List<Currencies> CurrenciesList { get; }
         #endregion
 
@@ -74,10 +83,24 @@ namespace TaxHelper
 
         });
 
+        public RelayCommand RemovePaymentCommand => new RelayCommand((obj) =>
+        {
+            if (obj is PaymentModel payment)
+            {
+                Payments.Remove(payment);
+            }
+        });
+
+        public RelayCommand CalculateTaxCommand => new RelayCommand((obj) =>
+        {
+            TaxesResult = _taxCalculatorService.CalculateTax(Payments);
+            
+        });
+
         #endregion
 
         #region Methods
-       
+
         #endregion
     }
 }

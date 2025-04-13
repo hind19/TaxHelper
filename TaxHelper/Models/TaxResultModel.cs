@@ -2,8 +2,8 @@
 {
     public class TaxResultModel
     {
-        public double TotalSum { get; set; }
-        public double TotalUnitedTax { get; set; }
-        public double MilitaryFee { get; set; }
+        public double TotalSumUah { get; set; }
+        public double UnitedTax { get; set; }
+        public double MilitaryTax { get; set; }
     }
 }
