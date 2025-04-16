@@ -6,6 +6,6 @@ namespace TaxHelper.Models
     {
         public DateTime PaymentDate { get; set; }
         public double PaymentSum { get; set; }
-        public Currencies PaymentCurrency { get; set; }
+        public CurrenciesEnum PaymentCurrency { get; set; }
     }
 }

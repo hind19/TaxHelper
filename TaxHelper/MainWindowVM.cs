@@ -14,36 +14,29 @@ namespace TaxHelper
     public class MainWindowVM : ViewModel
     {
         #region Fields
-        private bool _isManualSource;
-        private bool _isCsvSource;
         private ObservableCollection<PaymentModel>? _payments;
         private readonly ITaxCalculatorService _taxCalculatorService;
         private readonly ICsvParserService _csvParserService;
         private TaxResultModel? _taxesResult;
+        private DataSourceType _selectedDataSource;
         #endregion
 
         #region Ctor
         public MainWindowVM()
         {
-            IsManualSource = true;
+            SelectedDataSource = DataSourceType.Manual;
             Payments = new ObservableCollection<PaymentModel>();
-            CurrenciesList = Enum.GetValues(typeof(Currencies)).Cast<Currencies>().ToList();
+            CurrenciesList = Enum.GetValues(typeof(CurrenciesEnum)).Cast<CurrenciesEnum>().ToList();
             _taxCalculatorService = DependencyResolver.Resolve<ITaxCalculatorService>();
             _csvParserService = DependencyResolver.Resolve<ICsvParserService>();
         }
         #endregion
 
         #region Properties
-        public bool IsManualSource
+        public DataSourceType SelectedDataSource
         {
-            get { return _isManualSource; }
-            set => Set(ref _isManualSource, value);
-        }
-
-        public bool IsCsvSource
-        {
-            get { return _isCsvSource; }
-            set => Set(ref _isCsvSource, value);
+            get => _selectedDataSource;
+            set => Set(ref _selectedDataSource, value);
         }
 
         public ObservableCollection<PaymentModel> Payments 
@@ -58,7 +51,7 @@ namespace TaxHelper
             set { _taxesResult = value; }
         }
 
-        public List<Currencies> CurrenciesList { get; }
+        public List<CurrenciesEnum> CurrenciesList { get; }
         #endregion
 
         #region Comamnds

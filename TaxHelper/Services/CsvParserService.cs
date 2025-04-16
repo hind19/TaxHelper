@@ -45,7 +45,7 @@ namespace TaxHelper.Services
                 {
                     PaymentDate = DateTime.Parse(columns[dateIndex]),
                     PaymentSum = paymentSum,
-                    PaymentCurrency = Enum.Parse<Currencies>(columns[currencyIndex])
+                    PaymentCurrency = Enum.Parse<CurrenciesEnum>(columns[currencyIndex])
                 };
 
                 importedPayments.Add(payment);

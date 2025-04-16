@@ -5,14 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/expression/interaction"
         xmlns:local="clr-namespace:TaxHelper"
+        xmlns:common="clr-namespace:TaxHelper.Common"
+        xmlns:converters="clr-namespace:TaxHelper.Converters"
         mc:Ignorable="d"
         Title="Налоговый калькулятор"
         Height="450"
         Width="800">
     <Window.DataContext>
         <local:MainWindowVM />
+       
     </Window.DataContext>
-    <Window.Resources>
+    <Window.Resources> 
+        <converters:DataSourceTypeToBooleanConverter x:Key="DataSourceTypeToBooleanConverter" />
+        <converters:DataSourceTypeToVisibilityConverter x:Key="DataSourceTypeToVisibilityConverter" />
         <Style x:Key="tblocktyle" TargetType="TextBlock">
             <Setter Property="Margin"
                     Value="5" />
@@ -25,7 +30,7 @@
         </Style>
         <Style x:Key="btnStyle" TargetType="Button">
             <Setter Property="Margin"
-                    Value="5" />
+                    Value="10" />
             <Setter Property="Padding"
                     Value="7,3" />
             <Setter Property="Width"
@@ -65,10 +70,10 @@
                   Margin="10">
             <StackPanel Orientation="Horizontal">
                 <RadioButton Content="Ручной ввод"
-                             IsChecked="{Binding IsManualSource}"
+                             IsChecked="{Binding SelectedDataSource, Converter={StaticResource DataSourceTypeToBooleanConverter}, ConverterParameter=Manual}"
                              Margin="15" />
                 <RadioButton Content=".csv"
-                             IsChecked="{Binding IsCsvSource}"
+                             IsChecked="{Binding SelectedDataSource, Converter={StaticResource DataSourceTypeToBooleanConverter}, ConverterParameter=Csv}"
                              Margin="15" />
             </StackPanel>
 
@@ -81,14 +86,15 @@
                         VerticalAlignment="Center">
                 <Button Name="btnAddActivity"
                         Style="{StaticResource ResourceKey=btnStyle}"
+                        Visibility="{Binding SelectedDataSource, Converter={StaticResource DataSourceTypeToVisibilityConverter}, ConverterParameter=Manual}"
                         Content="Добавить платеж"
                         Command="{Binding AddPaymentCommand}" />
                 <Button Name="btnSaveToCsv"
                         Content="Открыть .csv файл"
                         Command="{Binding ImportCsvCommand}"
                         Style="{StaticResource ResourceKey=btnStyle}"
-                        Grid.Row="2"
-                        Margin="10" />
+                        Visibility="{Binding SelectedDataSource, Converter={StaticResource DataSourceTypeToVisibilityConverter}, ConverterParameter=Csv}"
+                        Grid.Row="2"/>
             </StackPanel>
             <ListView ItemsSource="{Binding Payments}"
                       Background="LightGray"
