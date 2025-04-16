@@ -18,6 +18,7 @@ namespace TaxHelper
         private bool _isCsvSource;
         private ObservableCollection<PaymentModel>? _payments;
         private readonly ITaxCalculatorService _taxCalculatorService;
+        private readonly ICsvParserService _csvParserService;
         private TaxResultModel? _taxesResult;
         #endregion
 
@@ -28,6 +29,7 @@ namespace TaxHelper
             Payments = new ObservableCollection<PaymentModel>();
             CurrenciesList = Enum.GetValues(typeof(Currencies)).Cast<Currencies>().ToList();
             _taxCalculatorService = DependencyResolver.Resolve<ITaxCalculatorService>();
+            _csvParserService = DependencyResolver.Resolve<ICsvParserService>();
         }
         #endregion
 
@@ -94,46 +96,8 @@ namespace TaxHelper
                 try
                 {
                     var filePath = openFileDialog.FileName;
-                    var lines = File.ReadAllLines(filePath);
-
-                    if (lines.Length < 2)
-                    {
-                        throw new Exception("Файл пустой или содержит только заголовки.");
-                    }
-
-                    var headers = lines[0].Split(ConfigurationManager.AppSettings["ColumnSplitter"]);
-
-                    var dateIndex = Array.IndexOf(headers, ConfigurationManager.AppSettings["PaymentDateColumn"]);
-                    var sumIndex = Array.IndexOf(headers, ConfigurationManager.AppSettings["PaymentAmountColumn"]);
-                    var currencyIndex = Array.IndexOf(headers, ConfigurationManager.AppSettings["PaymentCurrencyColumn"]);
-
-                    if (dateIndex == -1 || sumIndex == -1 || currencyIndex == -1)
-                    {
-                        throw new Exception("Файл не содержит необходимых заголовков: PaymentDate, PaymentSum, PaymentCurrency.");
-                    }
-
-                    var importedPayments = new ObservableCollection<PaymentModel>();
-                    foreach (var line in lines.Skip(1)) 
-                    {
-                        var columns = line.Split(ConfigurationManager.AppSettings["ColumnSplitter"]);
-
-                        var paymentSum = double.Parse(columns[sumIndex], CultureInfo.InvariantCulture);
-                        if (paymentSum == 0)
-                        {
-                            continue;
-                        }
-
-                        var payment = new PaymentModel
-                        {
-                            PaymentDate = DateTime.Parse(columns[dateIndex]),
-                            PaymentSum = paymentSum,
-                            PaymentCurrency = Enum.Parse<Currencies>(columns[currencyIndex])
-                        };
-
-                        importedPayments.Add(payment);
-                    }
-
-                    Payments = importedPayments;
+                   
+                    Payments = new ObservableCollection<PaymentModel>(_csvParserService.ParseCsv(filePath));
                 }
                 catch (Exception ex)
                 {

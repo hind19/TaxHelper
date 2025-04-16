@@ -19,6 +19,7 @@ namespace TaxHelper
         {
             DependencyResolver.Register<ITaxCalculatorService>(() => new TaxCalculatorService());
             DependencyResolver.Register<IWebClientService>(() => new WebClientService());
+            DependencyResolver.Register<ICsvParserService>(() => new CsvParserService());
         }
     }
 }
