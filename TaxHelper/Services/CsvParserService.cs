@@ -9,10 +9,10 @@ namespace TaxHelper.Services
 {
     public class CsvParserService : ICsvParserService
     {
-        public IEnumerable<PaymentModel> ParseCsv(string filePath)
+        public async Task<IEnumerable<PaymentModel>> ParseCsvAsync(string filePath)
         {
             
-            var lines = File.ReadAllLines(filePath);
+            var lines = await File.ReadAllLinesAsync(filePath);
 
             if (lines.Length < 2)
             {

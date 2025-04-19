@@ -78,9 +78,11 @@
             </StackPanel>
 
         </GroupBox>
-        <StackPanel Orientation="Vertical"
-                    HorizontalAlignment="Stretch"
-                    Grid.Row="1">
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
@@ -93,14 +95,14 @@
                         Content="Открыть .csv файл"
                         Command="{Binding ImportCsvCommand}"
                         Style="{StaticResource ResourceKey=btnStyle}"
-                        Visibility="{Binding SelectedDataSource, Converter={StaticResource DataSourceTypeToVisibilityConverter}, ConverterParameter=Csv}"
-                        Grid.Row="2"/>
+                        Visibility="{Binding SelectedDataSource, Converter={StaticResource DataSourceTypeToVisibilityConverter}, ConverterParameter=Csv}" />
             </StackPanel>
             <ListView ItemsSource="{Binding Payments}"
                       Background="LightGray"
                       MaxHeight="600"
                       ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      ScrollViewer.CanContentScroll="True">
+                      ScrollViewer.CanContentScroll="True"
+                      Grid.Row="1">
               
                 <ListView.ItemTemplate>
                     <DataTemplate>
@@ -144,7 +146,7 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-        </StackPanel>
+        </Grid>
        
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
