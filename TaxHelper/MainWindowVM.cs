@@ -1,5 +1,6 @@
 ﻿using Jellyfish;
 using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Globalization;
@@ -71,12 +72,18 @@ namespace TaxHelper
 
         public RelayCommand CalculateTaxCommand => new RelayCommand((obj) =>
         {
+            if(Payments.Any(p => p.PaymentSum <= 0 || !CurrenciesEnum.TryParse(p.ToString(), out double paymentCurrency)))
+            {
+                MessageBox.Show("Суммы должны быть больше 0 и валюта платежа должна быть выбрана", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             TaxesResult = _taxCalculatorService.CalculateTax(Payments);
             Notify(nameof(TaxesResult));
             
         });
 
-        public RelayCommand ImportCsvCommand => new RelayCommand((obj) =>
+        public RelayCommand ImportCsvCommand => new RelayCommand(async (obj) =>
         {
             var openFileDialog = new OpenFileDialog
             {
@@ -90,7 +97,7 @@ namespace TaxHelper
                 {
                     var filePath = openFileDialog.FileName;
                    
-                    Payments = new ObservableCollection<PaymentModel>(_csvParserService.ParseCsv(filePath));
+                    Payments = new ObservableCollection<PaymentModel>(await _csvParserService.ParseCsvAsync(filePath));
                 }
                 catch (Exception ex)
                 {

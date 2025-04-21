@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:TaxHelper"
         xmlns:common="clr-namespace:TaxHelper.Common"
         xmlns:converters="clr-namespace:TaxHelper.Converters"
+        xmlns:validation="clr-namespace:TaxHelper.ValidationRules"
         mc:Ignorable="d"
         Title="Налоговый калькулятор"
         Height="450"
@@ -55,6 +56,38 @@
                BasedOn="{StaticResource tblocktyle}">
             <Setter Property="Foreground"
                     Value="DarkRed" />
+        </Style>
+        <Style x:Key="tboxErrorMessage"
+               TargetType="TextBox">
+            <Setter Property="Validation.ErrorTemplate">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <AdornedElementPlaceholder x:Name="AdornedElementPlaceholder" />
+                            <TextBlock Text="{Binding ErrorContent}"
+                                       Foreground="Red"
+                                       FontSize="12"
+                                       Margin="5" />
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="comboboxErrorMessage"
+               TargetType="ComboBox">
+            <Setter Property="Validation.ErrorTemplate">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <AdornedElementPlaceholder x:Name="AdornedElementPlaceholder" />
+                            <TextBlock Text="{Binding ErrorContent}"
+                                       Foreground="Red"
+                                       FontSize="12"
+                                       Margin="5" />
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
     
@@ -120,17 +153,33 @@
                             <TextBox x:Name="Sum"
                                      Grid.Column="1"
                                      Width="50"
-                                     Text="{Binding PaymentSum}"
                                      HorizontalAlignment="Center"
                                      VerticalAlignment="Center"
-                                     Margin="20" />
+                                     Margin="20"
+                                     Style="{StaticResource tboxErrorMessage}">
+                                <TextBox.Text>
+                                <Binding Path="PaymentSum" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <validation:PaymentSumValidationRule />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <ComboBox Grid.Column="2"
                                       ItemsSource="{Binding DataContext.CurrenciesList, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"
-                                      SelectedValue="{Binding PaymentCurrency}"
                                       Width="200"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
-                                      Margin="20" />
+                                      Margin="20">
+                                <ComboBox.SelectedValue>
+                                    <Binding Path="PaymentCurrency"
+                                             UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <validation:EmptyCurrencyValidationRule />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </ComboBox.SelectedValue>
+                            </ComboBox>
                             <Button x:Name="btnDeletePayment"
                                     Grid.Column="3"
                                     Content="X"
