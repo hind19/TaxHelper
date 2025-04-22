@@ -8,7 +8,7 @@ namespace TaxHelper.ValidationRules
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            if (value is null || !CurrenciesEnum.TryParse(value.ToString(), out double paymentCurrency))
+            if (value is null || !Enum.TryParse(value.ToString(), out CurrenciesEnum paymentCurrency))
             {
                 return new ValidationResult(false, "Валюта платежа не выбрана.");
             }

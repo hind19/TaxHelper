@@ -70,15 +70,16 @@ namespace TaxHelper
             }
         });
 
-        public RelayCommand CalculateTaxCommand => new RelayCommand((obj) =>
+        public RelayCommand CalculateTaxCommand => new RelayCommand(async (obj) =>
         {
-            if(Payments.Any(p => p.PaymentSum <= 0 || !CurrenciesEnum.TryParse(p.ToString(), out double paymentCurrency)))
+            
+            if (Payments.Any(p => p.PaymentSum <= 0 || !Enum.TryParse(p.PaymentCurrency.ToString(), out CurrenciesEnum paymentCurrency)))
             {
                 MessageBox.Show("Суммы должны быть больше 0 и валюта платежа должна быть выбрана", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            TaxesResult = _taxCalculatorService.CalculateTax(Payments);
+            TaxesResult = await _taxCalculatorService.CalculateTax(Payments);
             Notify(nameof(TaxesResult));
             
         });

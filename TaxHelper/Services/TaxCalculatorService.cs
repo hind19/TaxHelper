@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using System.Threading.Tasks;
 using TaxHelper.Common;
 using TaxHelper.Models;
 
@@ -13,12 +14,12 @@ namespace TaxHelper.Services
             _webClientService = DependencyResolver.Resolve<IWebClientService>();
         }
         // Implement the methods defined in ITaxCalculatorService
-        public TaxResultModel CalculateTax(IEnumerable<PaymentModel> payments)
+        public async Task<TaxResultModel> CalculateTax(IEnumerable<PaymentModel> payments)
         {
             var totalSumUah = 0.0;
             foreach (var payment in payments)
             {
-                var exchangeRate = _webClientService.GetExchangeRate(payment.PaymentCurrency.ToString(), payment.PaymentDate);
+                var exchangeRate = await _webClientService.GetExchangeRate(payment.PaymentCurrency.ToString(), payment.PaymentDate);
                 var paymentSumUah = payment.PaymentSum * exchangeRate;
                 totalSumUah += paymentSumUah;
             }
