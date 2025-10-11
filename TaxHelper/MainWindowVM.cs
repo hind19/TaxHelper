@@ -1,10 +1,6 @@
 ﻿using Jellyfish;
 using Microsoft.Win32;
-using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
-using System.Configuration;
-using System.Globalization;
-using System.IO;
 using System.Windows;
 using TaxHelper.Common;
 using TaxHelper.Models;
@@ -106,6 +102,8 @@ namespace TaxHelper
                 }
             }
         });
+
+        // TODO: Bind Payment Sum and Currency changed events to recalculate Sum Hrn property.
         #endregion
 
         #region Methods

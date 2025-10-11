@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using TaxHelper.Common;
 using TaxHelper.Services;
+using TaxHelper.Services.PaymentCreation;
 
 namespace TaxHelper
 {
@@ -20,6 +21,7 @@ namespace TaxHelper
             DependencyResolver.Register<ITaxCalculatorService>(() => new TaxCalculatorService());
             DependencyResolver.Register<IWebClientService>(() => new WebClientService());
             DependencyResolver.Register<ICsvParserService>(() => new CsvParserService());
+            DependencyResolver.Register<IPaymentModelService>(() => new PaymentModelService());
         }
     }
 }

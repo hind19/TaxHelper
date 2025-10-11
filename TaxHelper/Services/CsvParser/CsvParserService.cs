@@ -4,11 +4,17 @@ using System.Globalization;
 using System.IO;
 using TaxHelper.Common;
 using TaxHelper.Models;
+using TaxHelper.Services.PaymentCreation;
 
 namespace TaxHelper.Services
 {
     public class CsvParserService : ICsvParserService
     {
+        private readonly IPaymentModelService _paymentModelService;
+        public CsvParserService()
+        {
+            _paymentModelService = DependencyResolver.Resolve<IPaymentModelService>();
+        }
         public async Task<IEnumerable<PaymentModel>> ParseCsvAsync(string filePath)
         {
             
@@ -30,28 +36,7 @@ namespace TaxHelper.Services
                 throw new Exception("Файл не содержит необходимых заголовков: PaymentDate, PaymentSum, PaymentCurrency.");
             }
 
-            var importedPayments = new ObservableCollection<PaymentModel>();
-            foreach (var line in lines.Skip(1))
-            {
-                var columns = line.Split(ConfigurationManager.AppSettings["ColumnSplitter"]);
-
-                var paymentSum = double.Parse(columns[sumIndex], CultureInfo.InvariantCulture);
-                if (paymentSum == 0)
-                {
-                    continue;
-                }
-
-                var payment = new PaymentModel
-                {
-                    PaymentDate = DateTime.Parse(columns[dateIndex]),
-                    PaymentSum = paymentSum,
-                    PaymentCurrency = Enum.Parse<CurrenciesEnum>(columns[currencyIndex])
-                };
-
-                importedPayments.Add(payment);
-            }
-
-            return importedPayments;
+            return  await _paymentModelService.GetPaymentModels( new ParsedCsvModel(lines, sumIndex, dateIndex, currencyIndex));
         }
     }
 }

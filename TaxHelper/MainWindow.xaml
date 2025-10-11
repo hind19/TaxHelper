@@ -8,6 +8,7 @@
         xmlns:common="clr-namespace:TaxHelper.Common"
         xmlns:converters="clr-namespace:TaxHelper.Converters"
         xmlns:validation="clr-namespace:TaxHelper.ValidationRules"
+        xmlns:behaviours="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="Налоговый калькулятор"
         Height="450"
@@ -89,9 +90,11 @@
                 </Setter.Value>
             </Setter>
         </Style>
+      
     </Window.Resources>
     
     <Grid Background="LightGray">
+       
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -138,12 +141,15 @@
                       Grid.Row="1">
               
                 <ListView.ItemTemplate>
+                  
                     <DataTemplate>
+                      
                         <Grid HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="0.2*" />
-                                <ColumnDefinition Width="0.7*" />
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="0.3*" />
+                                <ColumnDefinition Width="0.05*" />
+                                <ColumnDefinition Width="0.3*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <DatePicker x:Name="datePicker"
@@ -157,6 +163,7 @@
                                      VerticalAlignment="Center"
                                      Margin="20"
                                      Style="{StaticResource tboxErrorMessage}">
+                               
                                 <TextBox.Text>
                                 <Binding Path="PaymentSum" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
@@ -164,10 +171,9 @@
                                     </Binding.ValidationRules>
                                 </Binding>
                                 </TextBox.Text>
-                            </TextBox>
+                                </TextBox>
                             <ComboBox Grid.Column="2"
                                       ItemsSource="{Binding DataContext.CurrenciesList, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"
-                                      Width="200"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
                                       Margin="20">
@@ -180,8 +186,14 @@
                                     </Binding>
                                 </ComboBox.SelectedValue>
                             </ComboBox>
+                            <TextBlock Style="{StaticResource ResourceKey=tblockGreen}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="3"
+                                       Margin="5"
+                                       Text="{Binding PaymentSumUah}"/>
                             <Button x:Name="btnDeletePayment"
-                                    Grid.Column="3"
+                                    Grid.Column="4"
                                     Content="X"
                                     Foreground="Red"
                                     FontWeight="Bold"
