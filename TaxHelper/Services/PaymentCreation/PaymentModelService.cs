@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Globalization;
 using TaxHelper.Common;
 using TaxHelper.Models;
@@ -10,7 +9,7 @@ namespace TaxHelper.Services.PaymentCreation
     {
         private readonly IWebClientService _webClientService;
         private const int HeaderLinesNumber = 1;
-        private const int RoundAccuracy = 2;
+        
 
         public PaymentModelService()
         {
@@ -40,7 +39,7 @@ namespace TaxHelper.Services.PaymentCreation
                 if(payment.PaymentCurrency != CurrenciesEnum.UAH)
                 {
                     var exchangeRate = await _webClientService.GetExchangeRate(payment.PaymentCurrency.ToString(), payment.PaymentDate);
-                    payment.PaymentSumUah = Math.Round(payment.PaymentSum * exchangeRate, RoundAccuracy);
+                    payment.PaymentSumUah = Math.Round(payment.PaymentSum * exchangeRate, Constants.RoundAccuracy);
                 }
 
                 importedPayments.Add(payment);

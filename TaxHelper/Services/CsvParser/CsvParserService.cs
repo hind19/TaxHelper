@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Configuration;
-using System.Globalization;
+﻿using System.Configuration;
 using System.IO;
 using TaxHelper.Common;
 using TaxHelper.Models;

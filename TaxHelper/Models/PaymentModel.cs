@@ -1,23 +1,28 @@
-﻿using TaxHelper.Common;
+﻿using Jellyfish;
+using TaxHelper.Common;
 
 namespace TaxHelper.Models
 {
-    public class PaymentModel
+    public class PaymentModel : ObservableObject
     {
-        private double _paymentSum;
         private double _paymentSumUah;
+       
         public DateTime PaymentDate { get; set; }
-        public double PaymentSum {
+        
+        public double PaymentSum { get; set; }
+
+        public CurrenciesEnum PaymentCurrency { get; set; }
+        
+        public double PaymentSumUah 
+        {
             get
             {
-                return _paymentSum;
+                return _paymentSumUah;
             }
-            set 
+            set
             {
-                _paymentSum = _paymentSumUah = value;
+                Set(ref _paymentSumUah, value);
             }
-        } 
-        public CurrenciesEnum PaymentCurrency { get; set; }
-        public double PaymentSumUah { get; set; }
+        }
     }
 }

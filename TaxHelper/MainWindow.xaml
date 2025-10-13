@@ -141,9 +141,7 @@
                       Grid.Row="1">
               
                 <ListView.ItemTemplate>
-                  
                     <DataTemplate>
-                      
                         <Grid HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="0.2*" />
@@ -163,7 +161,11 @@
                                      VerticalAlignment="Center"
                                      Margin="20"
                                      Style="{StaticResource tboxErrorMessage}">
-                               
+                               <behaviours:Interaction.Triggers>
+                                   <behaviours:EventTrigger EventName="LostFocus">
+                                        <behaviours:InvokeCommandAction Command="{Binding DataContext.RecalculateSumCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" PassEventArgsToCommand="True"/>
+                                   </behaviours:EventTrigger>
+                               </behaviours:Interaction.Triggers>
                                 <TextBox.Text>
                                 <Binding Path="PaymentSum" UpdateSourceTrigger="PropertyChanged">
                                     <Binding.ValidationRules>
@@ -177,6 +179,12 @@
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
                                       Margin="20">
+                                <behaviours:Interaction.Triggers>
+                                    <behaviours:EventTrigger EventName="SelectionChanged">
+                                        <behaviours:InvokeCommandAction Command="{Binding DataContext.RecalculateSumCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"
+                                                                        PassEventArgsToCommand="True" />
+                                    </behaviours:EventTrigger>
+                                </behaviours:Interaction.Triggers>
                                 <ComboBox.SelectedValue>
                                     <Binding Path="PaymentCurrency"
                                              UpdateSourceTrigger="PropertyChanged">
