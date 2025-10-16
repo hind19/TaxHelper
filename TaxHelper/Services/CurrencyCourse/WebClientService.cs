@@ -1,28 +1,26 @@
 ﻿using System.Configuration;
+using System.Data;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Web;
 
-namespace TaxHelper.Services
+namespace TaxHelper.Services.CurrencyCourse
 {
     internal class WebClientService : IWebClientService
     {
         public async Task<double> GetExchangeRate(string curreccyCode, DateTime rateDate)
         {
-            //var url = new Uri($"{ConfigurationManager.AppSettings["BankCurrenceExchangeUrl"]}?{ConfigurationManager.AppSettings["CurrencyCodeParam"]}={curreccyCode}&{ConfigurationManager.AppSettings["DateParam"]}={rateDate.Year}{(rateDate.Month < 10 ? "0"+rateDate.Month : rateDate.Month )}{(rateDate.Day < 10 ? "0"+rateDate.Day : rateDate.Day) }&json");
-
-            // Базовый URL
-            string baseUrl = ConfigurationManager.AppSettings["BankCurrenceExchangeUrl"];
-
-            // Параметры запроса
+            string? baseUrl = ConfigurationManager.AppSettings["BankCurrenceExchangeUrl"];
             Dictionary<string, string> queryParams = AssembleQueryParams(curreccyCode, rateDate);
 
+            if (string.IsNullOrWhiteSpace(baseUrl) || queryParams is null || !queryParams.Any())
+            {
+                throw new ArgumentException("Параметы для запроса курсов валюты не настроены. См.ReadMe файл для дополнительной информации.");
+            }
 
-            // Создаем HttpClient
             using var client = new HttpClient();
 
-            // Формируем строку запроса
             var uriBuilder = new UriBuilder(baseUrl);
             var query = HttpUtility.ParseQueryString(uriBuilder.Query);
             foreach (var param in queryParams)
@@ -31,13 +29,8 @@ namespace TaxHelper.Services
             }
             uriBuilder.Query = query.ToString();
 
-            // Выполняем GET-запрос
             var response = await client.GetAsync(uriBuilder.Uri);
 
-
-
-            //var client = new HttpClient();
-            //var response = client.GetAsync(url).Result;
             if (response.IsSuccessStatusCode)
             {
                 var content = response.Content.ReadAsStringAsync().Result;
@@ -55,10 +48,10 @@ namespace TaxHelper.Services
             {
                 throw new Exception($"Error fetching exchange rate: {response.StatusCode}");
             }
-            return default(double);
+            return default;
         }
 
-        private Dictionary<string, string> AssembleQueryParams(string curreccyCode, DateTime rateDate)
+        private Dictionary<string, string> AssembleQueryParams(string currencyCode, DateTime rateDate)
         {
             var queryParamsNames = new Dictionary<string, string>
             {
@@ -68,7 +61,7 @@ namespace TaxHelper.Services
 
             var queryParams = new Dictionary<string, string>
             {
-                { queryParamsNames["CurrencyCodeParam"], curreccyCode },
+                { queryParamsNames["CurrencyCodeParam"], currencyCode },
                 { queryParamsNames["DateParam"], $"{rateDate.Year}{(rateDate.Month < 10 ? "0" + rateDate.Month : rateDate.Month)}{(rateDate.Day < 10 ? "0" + rateDate.Day : rateDate.Day)}" }
             };
 

@@ -4,7 +4,7 @@ using TaxHelper.Common;
 using TaxHelper.Models;
 using TaxHelper.Services.PaymentCreation;
 
-namespace TaxHelper.Services
+namespace TaxHelper.Services.CsvParser
 {
     public class CsvParserService : ICsvParserService
     {

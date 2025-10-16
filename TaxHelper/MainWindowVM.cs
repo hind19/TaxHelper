@@ -1,18 +1,21 @@
 ﻿using Jellyfish;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using TaxHelper.Common;
 using TaxHelper.Models;
 using TaxHelper.Services;
+using TaxHelper.Services.CsvParser;
+using TaxHelper.Services.CurrencyCourse;
 
 namespace TaxHelper
 {
     public class MainWindowVM : ViewModel
     {
         #region Fields
-        private ObservableCollection<PaymentModel>? _payments;
+        private ObservableCollection<PaymentModel> _payments;
         private readonly ITaxCalculatorService _taxCalculatorService;
         private readonly ICsvParserService _csvParserService;
         private readonly IWebClientService _webClientService;
@@ -24,7 +27,7 @@ namespace TaxHelper
         public MainWindowVM()
         {
             SelectedDataSource = DataSourceType.Manual;
-            Payments = new ObservableCollection<PaymentModel>();
+            _payments = new ObservableCollection<PaymentModel>();
             CurrenciesList = Enum.GetValues(typeof(CurrenciesEnum)).Cast<CurrenciesEnum>().ToList();
             _taxCalculatorService = DependencyResolver.Resolve<ITaxCalculatorService>();
             _csvParserService = DependencyResolver.Resolve<ICsvParserService>();
@@ -69,7 +72,7 @@ namespace TaxHelper
               }
         });
         
-        public RelayCommand RecalculateSumCommand => new RelayCommand((obj) =>
+        public RelayCommand RecalculateSumCommand => new RelayCommand(async (obj) =>
         {
             var args = obj as RoutedEventArgs;
             if (args is null)
@@ -80,16 +83,16 @@ namespace TaxHelper
             if (args.OriginalSource is TextBox textBox
                 &&  textBox.DataContext is PaymentModel payment)
             {
-                RecalculatePaymentData(payment);
+                await RecalculatePaymentData(payment);
             }
 
             if (args.OriginalSource is ComboBox comboBox
                && comboBox.DataContext is PaymentModel paymentCur)
             {
-                RecalculatePaymentData(paymentCur);
+                await RecalculatePaymentData(paymentCur);
             }
 
-            void RecalculatePaymentData(PaymentModel payment)
+            async Task RecalculatePaymentData(PaymentModel payment)
             {
                 if (payment.PaymentCurrency != default && payment.PaymentSum != default)
                 {
@@ -99,14 +102,13 @@ namespace TaxHelper
                         return;
                     }
 
-                    var exchangeRateTask = Task.Run(() => _webClientService.GetExchangeRate(payment.PaymentCurrency.ToString(), payment.PaymentDate));
-                    var exchangeRate = exchangeRateTask.Result;
+                    var exchangeRate = await _webClientService.GetExchangeRate(payment.PaymentCurrency.ToString(), payment.PaymentDate);
                     payment.PaymentSumUah = Math.Round(payment.PaymentSum * exchangeRate, Constants.RoundAccuracy);
                 }
             }
         });
 
-        public RelayCommand CalculateTaxCommand => new RelayCommand(async (obj) =>
+        public RelayCommand CalculateTaxCommand => new RelayCommand((obj) =>
         {
             
             if (Payments.Any(p => p.PaymentSum <= 0 || !Enum.TryParse(p.PaymentCurrency.ToString(), out CurrenciesEnum paymentCurrency)))
@@ -115,7 +117,7 @@ namespace TaxHelper
                 return;
             }
 
-            TaxesResult = await _taxCalculatorService.CalculateTax(Payments);
+            TaxesResult = _taxCalculatorService.CalculateTax(Payments);
             Notify(nameof(TaxesResult));
             
         });

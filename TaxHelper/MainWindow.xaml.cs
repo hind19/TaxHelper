@@ -1,6 +1,8 @@
 ﻿using System.Windows;
 using TaxHelper.Common;
 using TaxHelper.Services;
+using TaxHelper.Services.CsvParser;
+using TaxHelper.Services.CurrencyCourse;
 using TaxHelper.Services.PaymentCreation;
 
 namespace TaxHelper

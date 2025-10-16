@@ -1,4 +1,4 @@
-﻿namespace TaxHelper.Services
+﻿namespace TaxHelper.Services.CurrencyCourse
 {
     internal interface IWebClientService
     {

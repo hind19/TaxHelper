@@ -1,19 +1,16 @@
 ﻿using System.Configuration;
-using TaxHelper.Common;
 using TaxHelper.Models;
 
 namespace TaxHelper.Services
 {
     internal class TaxCalculatorService : ITaxCalculatorService
     {
-        private readonly IWebClientService _webClientService;
 
         public TaxCalculatorService()
         {
-            _webClientService = DependencyResolver.Resolve<IWebClientService>();
         }
        
-        public async Task<TaxResultModel> CalculateTax(IEnumerable<PaymentModel> payments)
+        public  TaxResultModel CalculateTax(IEnumerable<PaymentModel> payments)
         {
             var totalSumUah =  payments.Sum(x => x.PaymentSumUah);
             var taxRatesucceeded = Int32.TryParse(ConfigurationManager.AppSettings["TaxRate"], out int taxRate);

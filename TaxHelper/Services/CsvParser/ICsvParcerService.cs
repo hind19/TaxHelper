@@ -1,6 +1,6 @@
 ﻿using TaxHelper.Models;
 
-namespace TaxHelper.Services
+namespace TaxHelper.Services.CsvParser
 {
     public interface ICsvParserService
     {
