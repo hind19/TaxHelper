@@ -1,8 +1,8 @@
 ﻿using System.Configuration;
 using System.IO;
-using TaxHelper.Common;
 using TaxHelper.Models;
 using TaxHelper.Services.PaymentCreation;
+using TaxHelper.Shared;
 
 namespace TaxHelper.Services.CsvParser
 {

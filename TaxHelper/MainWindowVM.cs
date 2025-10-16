@@ -4,11 +4,11 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using TaxHelper.Common;
 using TaxHelper.Models;
 using TaxHelper.Services;
 using TaxHelper.Services.CsvParser;
 using TaxHelper.Services.CurrencyCourse;
+using TaxHelper.Shared;
 
 namespace TaxHelper
 {

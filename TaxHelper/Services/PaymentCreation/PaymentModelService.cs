@@ -1,8 +1,8 @@
 ﻿using System.Configuration;
 using System.Globalization;
-using TaxHelper.Common;
 using TaxHelper.Models;
 using TaxHelper.Services.CurrencyCourse;
+using TaxHelper.Shared;
 
 namespace TaxHelper.Services.PaymentCreation
 {

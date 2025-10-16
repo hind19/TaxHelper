@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using System.Windows.Controls;
-using TaxHelper.Common;
+using TaxHelper.Shared;
 
 namespace TaxHelper.ValidationRules
 {

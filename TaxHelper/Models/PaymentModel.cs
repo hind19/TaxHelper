@@ -1,5 +1,5 @@
 ﻿using Jellyfish;
-using TaxHelper.Common;
+using TaxHelper.Shared;
 
 namespace TaxHelper.Models
 {

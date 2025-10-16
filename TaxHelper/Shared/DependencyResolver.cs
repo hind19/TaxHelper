@@ -1,4 +1,4 @@
-﻿namespace TaxHelper.Common
+﻿namespace TaxHelper.Shared
 {
     internal static class DependencyResolver
     {
