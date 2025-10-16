@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/expression/interaction"
         xmlns:local="clr-namespace:TaxHelper"
-        xmlns:common="clr-namespace:TaxHelper.Common"
         xmlns:converters="clr-namespace:TaxHelper.Converters"
         xmlns:validation="clr-namespace:TaxHelper.ValidationRules"
         xmlns:behaviours="http://schemas.microsoft.com/xaml/behaviors"
