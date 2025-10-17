@@ -12,6 +12,9 @@ using TaxHelper.Shared;
 
 namespace TaxHelper
 {
+    /// <summary>
+    /// ViewModel for the main window. Manages payments, currency conversion, and tax calculation.
+    /// </summary>
     public class MainWindowVM : ViewModel
     {
         #region Fields
@@ -24,6 +27,9 @@ namespace TaxHelper
         #endregion
 
         #region Ctor
+        /// <summary>
+        /// Initializes a new instance of the MainWindowVM and resolves required services.
+        /// </summary>
         public MainWindowVM()
         {
             SelectedDataSource = DataSourceType.Manual;
@@ -48,7 +54,7 @@ namespace TaxHelper
             set => Set(ref _payments, value);
         }
 
-        public TaxResultModel TaxesResult
+        public TaxResultModel? TaxesResult
         {
             get { return _taxesResult; }
             set { _taxesResult = value; }
@@ -58,12 +64,18 @@ namespace TaxHelper
         #endregion
 
         #region Comamnds
+        /// <summary>
+        /// Adds a new payment row with a pre-filled date based on the configured MonthsBehind value.
+        /// </summary>
         public RelayCommand AddPaymentCommand => new RelayCommand((obj) =>
         {
             var payment = new PaymentModel { PaymentDate = DateTime.Now.AddMonths(Constants.MonthsBehind) };
             Payments.Add(payment);
         });
 
+        /// <summary>
+        /// Removes the specified payment row when the command parameter is a PaymentModel.
+        /// </summary>
         public RelayCommand RemovePaymentCommand => new RelayCommand((obj) =>
         {
               if (obj is PaymentModel payment)
@@ -72,6 +84,9 @@ namespace TaxHelper
               }
         });
         
+        /// <summary>
+        /// Recalculates the UAH amount for a payment when amount or currency changes; fetches exchange rate if needed.
+        /// </summary>
         public RelayCommand RecalculateSumCommand => new RelayCommand(async (obj) =>
         {
             var args = obj as RoutedEventArgs;
@@ -108,6 +123,9 @@ namespace TaxHelper
             }
         });
 
+        /// <summary>
+        /// Validates payments and calculates taxes for all listed payments.
+        /// </summary>
         public RelayCommand CalculateTaxCommand => new RelayCommand((obj) =>
         {
             
@@ -122,6 +140,9 @@ namespace TaxHelper
             
         });
 
+        /// <summary>
+        /// Opens a file dialog and imports payments from a CSV file using configured mappings.
+        /// </summary>
         public RelayCommand ImportCsvCommand => new RelayCommand(async (obj) =>
         {
             var openFileDialog = new OpenFileDialog

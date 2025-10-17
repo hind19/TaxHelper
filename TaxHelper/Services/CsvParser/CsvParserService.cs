@@ -6,13 +6,26 @@ using TaxHelper.Shared;
 
 namespace TaxHelper.Services.CsvParser
 {
+    /// <summary>
+    /// Parses CSV files into a sequence of PaymentModel instances using column mappings
+    /// defined in App.config.
+    /// </summary>
     public class CsvParserService : ICsvParserService
     {
         private readonly IPaymentModelService _paymentModelService;
+        /// <summary>
+        /// Initializes a new instance of CsvParserService and resolves dependencies.
+        /// </summary>
         public CsvParserService()
         {
             _paymentModelService = DependencyResolver.Resolve<IPaymentModelService>();
         }
+        /// <summary>
+        /// Parses the provided CSV file path into payment models.
+        /// </summary>
+        /// <param name="filePath">Absolute path to a CSV file.</param>
+        /// <returns>Collection of parsed PaymentModel records.</returns>
+        /// <exception cref="Exception">Thrown when the file is empty or required headers are missing.</exception>
         public async Task<IEnumerable<PaymentModel>> ParseCsvAsync(string filePath)
         {
             

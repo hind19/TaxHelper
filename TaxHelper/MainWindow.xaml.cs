@@ -12,12 +12,18 @@ namespace TaxHelper
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// Initializes the main window and registers application dependencies.
+        /// </summary>
         public MainWindow()
         { 
             RegisterDependencies();
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Registers service implementations in the application's dependency resolver.
+        /// </summary>
         private void RegisterDependencies()
         {
             DependencyResolver.Register<ITaxCalculatorService>(() => new TaxCalculatorService());
