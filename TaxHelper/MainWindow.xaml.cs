@@ -2,6 +2,7 @@
 using TaxHelper.Services;
 using TaxHelper.Services.CsvParser;
 using TaxHelper.Services.CurrencyCourse;
+using TaxHelper.Services.DialogService;
 using TaxHelper.Services.PaymentCreation;
 using TaxHelper.Shared;
 
@@ -30,6 +31,7 @@ namespace TaxHelper
             DependencyResolver.Register<IWebClientService>(() => new WebClientService());
             DependencyResolver.Register<ICsvParserService>(() => new CsvParserService());
             DependencyResolver.Register<IPaymentModelService>(() => new PaymentModelService());
+            DependencyResolver.Register<IDialogService>(() => new DialogService());
         }
     }
 }

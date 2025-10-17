@@ -1,13 +1,13 @@
 ﻿using Jellyfish;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using TaxHelper.Models;
 using TaxHelper.Services;
 using TaxHelper.Services.CsvParser;
 using TaxHelper.Services.CurrencyCourse;
+using TaxHelper.Services.DialogService;
 using TaxHelper.Shared;
 
 namespace TaxHelper
@@ -18,15 +18,24 @@ namespace TaxHelper
     public class MainWindowVM : ViewModel
     {
         #region Fields
+
         private ObservableCollection<PaymentModel> _payments;
         private readonly ITaxCalculatorService _taxCalculatorService;
         private readonly ICsvParserService _csvParserService;
         private readonly IWebClientService _webClientService;
+        private readonly IDialogService _dialogService;
         private TaxResultModel? _taxesResult;
         private DataSourceType _selectedDataSource;
+        private RelayCommand? _addPaymentCommand;
+        private RelayCommand? _removePaymentCommand;
+        private RelayCommand? _recalculateSumCommand;
+        private RelayCommand? _calculateTaxCommand;
+        private RelayCommand? _importCsvCommand;
+
         #endregion
 
         #region Ctor
+
         /// <summary>
         /// Initializes a new instance of the MainWindowVM and resolves required services.
         /// </summary>
@@ -38,17 +47,20 @@ namespace TaxHelper
             _taxCalculatorService = DependencyResolver.Resolve<ITaxCalculatorService>();
             _csvParserService = DependencyResolver.Resolve<ICsvParserService>();
             _webClientService = DependencyResolver.Resolve<IWebClientService>();
+            _dialogService = DependencyResolver.Resolve<IDialogService>();
         }
+
         #endregion
 
         #region Properties
+
         public DataSourceType SelectedDataSource
         {
             get => _selectedDataSource;
             set => Set(ref _selectedDataSource, value);
         }
 
-        public ObservableCollection<PaymentModel> Payments 
+        public ObservableCollection<PaymentModel> Payments
         {
             get { return _payments; }
             set => Set(ref _payments, value);
@@ -57,17 +69,19 @@ namespace TaxHelper
         public TaxResultModel? TaxesResult
         {
             get { return _taxesResult; }
-            set { _taxesResult = value; }
+            set => Set(ref _taxesResult, value);
         }
 
         public List<CurrenciesEnum> CurrenciesList { get; }
+
         #endregion
 
-        #region Comamnds
+        #region Commands
+
         /// <summary>
         /// Adds a new payment row with a pre-filled date based on the configured MonthsBehind value.
         /// </summary>
-        public RelayCommand AddPaymentCommand => new RelayCommand((obj) =>
+        public RelayCommand AddPaymentCommand => _addPaymentCommand ??= new RelayCommand((obj) =>
         {
             var payment = new PaymentModel { PaymentDate = DateTime.Now.AddMonths(Constants.MonthsBehind) };
             Payments.Add(payment);
@@ -76,18 +90,18 @@ namespace TaxHelper
         /// <summary>
         /// Removes the specified payment row when the command parameter is a PaymentModel.
         /// </summary>
-        public RelayCommand RemovePaymentCommand => new RelayCommand((obj) =>
+        public RelayCommand RemovePaymentCommand => _removePaymentCommand ??= new RelayCommand((obj) =>
         {
-              if (obj is PaymentModel payment)
-              {
-                  Payments.Remove(payment);
-              }
+            if (obj is PaymentModel payment)
+            {
+                Payments.Remove(payment);
+            }
         });
-        
+
         /// <summary>
         /// Recalculates the UAH amount for a payment when amount or currency changes; fetches exchange rate if needed.
         /// </summary>
-        public RelayCommand RecalculateSumCommand => new RelayCommand(async (obj) =>
+        public RelayCommand RecalculateSumCommand => _recalculateSumCommand ??= new RelayCommand(async (obj) =>
         {
             var args = obj as RoutedEventArgs;
             if (args is null)
@@ -96,29 +110,38 @@ namespace TaxHelper
             }
 
             if (args.OriginalSource is TextBox textBox
-                &&  textBox.DataContext is PaymentModel payment)
+                && textBox.DataContext is PaymentModel payment)
             {
                 await RecalculatePaymentData(payment);
             }
 
             if (args.OriginalSource is ComboBox comboBox
-               && comboBox.DataContext is PaymentModel paymentCur)
+                && comboBox.DataContext is PaymentModel paymentCur)
             {
                 await RecalculatePaymentData(paymentCur);
             }
 
             async Task RecalculatePaymentData(PaymentModel payment)
             {
-                if (payment.PaymentCurrency != default && payment.PaymentSum != default)
+                try
                 {
-                    if (payment.PaymentCurrency == CurrenciesEnum.UAH)
+                    if (payment.PaymentCurrency != default && payment.PaymentSum != default)
                     {
-                        payment.PaymentSumUah = payment.PaymentSum;
-                        return;
-                    }
+                        if (payment.PaymentCurrency == CurrenciesEnum.UAH)
+                        {
+                            payment.PaymentSumUah = payment.PaymentSum;
+                            return;
+                        }
 
-                    var exchangeRate = await _webClientService.GetExchangeRate(payment.PaymentCurrency.ToString(), payment.PaymentDate);
-                    payment.PaymentSumUah = Math.Round(payment.PaymentSum * exchangeRate, Constants.RoundAccuracy);
+                        var exchangeRate = await _webClientService.GetExchangeRate(payment.PaymentCurrency.ToString(),
+                            payment.PaymentDate);
+                        payment.PaymentSumUah = Math.Round(payment.PaymentSum * exchangeRate, Constants.RoundAccuracy);
+                    }
+                }
+                catch (Exception e)
+                {
+                    _dialogService.ShowError($"Ошибка при получении курса валюты: {e.Message}");
+                    throw;
                 }
             }
         });
@@ -126,24 +149,27 @@ namespace TaxHelper
         /// <summary>
         /// Validates payments and calculates taxes for all listed payments.
         /// </summary>
-        public RelayCommand CalculateTaxCommand => new RelayCommand((obj) =>
+        public RelayCommand CalculateTaxCommand => _calculateTaxCommand ??= new RelayCommand((obj) =>
         {
-            
-            if (Payments.Any(p => p.PaymentSum <= 0 || !Enum.TryParse(p.PaymentCurrency.ToString(), out CurrenciesEnum paymentCurrency)))
+            if (!Payments.Any())
             {
-                MessageBox.Show("Суммы должны быть больше 0 и валюта платежа должна быть выбрана", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                _dialogService.ShowError(Constants.ErrorConstants.NoPaymentsError);
+                return;
+            }
+
+            if (Payments.Any(p => p.PaymentSum <= 0 || p.PaymentCurrency == default))
+            {
+                _dialogService.ShowError(Constants.ErrorConstants.IncorrectPaymentFilling);
                 return;
             }
 
             TaxesResult = _taxCalculatorService.CalculateTax(Payments);
-            Notify(nameof(TaxesResult));
-            
         });
 
         /// <summary>
         /// Opens a file dialog and imports payments from a CSV file using configured mappings.
         /// </summary>
-        public RelayCommand ImportCsvCommand => new RelayCommand(async (obj) =>
+        public RelayCommand ImportCsvCommand => _importCsvCommand ??= new RelayCommand(async (obj) =>
         {
             var openFileDialog = new OpenFileDialog
             {
@@ -156,20 +182,16 @@ namespace TaxHelper
                 try
                 {
                     var filePath = openFileDialog.FileName;
-                   
+
                     Payments = new ObservableCollection<PaymentModel>(await _csvParserService.ParseCsvAsync(filePath));
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка при импорте CSV: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _dialogService.ShowError($"Ошибка при импорте CSV: {ex.Message}");
                 }
             }
         });
 
-       
-        #endregion
-
-        #region Methods
         #endregion
     }
 }
