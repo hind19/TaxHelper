@@ -28,7 +28,7 @@ namespace TaxHelper.Services.CurrencyCourse
             Dictionary<string, string> queryParams = AssembleQueryParams(curreccyCode, rateDate);
 
             if (string.IsNullOrWhiteSpace(baseUrl) 
-                || queryParams.Any(x =>  string.IsNullOrWhiteSpace(x.Value))
+                //|| queryParams.Any(x =>  string.IsNullOrWhiteSpace(x.Value)) // TODO: Solve the case with parameter 'json' withtout value
                 || !queryParams.Any())
             {
                 throw new ArgumentException("Параметы для запроса курсов валюты не настроены. См.ReadMe файл для дополнительной информации.");
