@@ -136,6 +136,6 @@ Contributing
 - Keep changes minimal and focused. Include brief notes in the PR description.
 
 License
-- Add your license of choice in a LICENSE file at the repository root.
+- No licenses from my side. Feel free to use it any legal way you want. Please keep in mind that some frameworks or libraries included in this solution may become proprietary any time.
 
 P.S. File has been created by Junie (JetBrains Raider Ai Agent)
