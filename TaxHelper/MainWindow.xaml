@@ -166,7 +166,7 @@
                                    </behaviours:EventTrigger>
                                </behaviours:Interaction.Triggers>
                                 <TextBox.Text>
-                                <Binding Path="PaymentSum" UpdateSourceTrigger="PropertyChanged">
+                                <Binding Path="PaymentSum" UpdateSourceTrigger="LostFocus">
                                     <Binding.ValidationRules>
                                         <validation:PaymentSumValidationRule />
                                     </Binding.ValidationRules>
