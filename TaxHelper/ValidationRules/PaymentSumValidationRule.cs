@@ -8,7 +8,8 @@ namespace TaxHelper.ValidationRules
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
-            if (value is null || !decimal.TryParse(value.ToString(), NumberStyles.Any, cultureInfo, out decimal paymentSum))
+            var normalized = value?.ToString()?.Trim().Replace(",", ".");
+            if (normalized is null || !decimal.TryParse(normalized, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal paymentSum))
             {
                 return new ValidationResult(false, "Строка суммы содержит невалидные символы.");
             }

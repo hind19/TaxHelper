@@ -19,6 +19,7 @@
     <Window.Resources> 
         <converters:DataSourceTypeToBooleanConverter x:Key="DataSourceTypeToBooleanConverter" />
         <converters:DataSourceTypeToVisibilityConverter x:Key="DataSourceTypeToVisibilityConverter" />
+        <converters:PaymentSumConverter x:Key="PaymentSumConverter" />
         <Style x:Key="tblocktyle" TargetType="TextBlock">
             <Setter Property="Margin"
                     Value="5" />
@@ -166,7 +167,7 @@
                                    </behaviours:EventTrigger>
                                </behaviours:Interaction.Triggers>
                                 <TextBox.Text>
-                                <Binding Path="PaymentSum" UpdateSourceTrigger="LostFocus">
+                                <Binding Path="PaymentSum" UpdateSourceTrigger="LostFocus" Converter="{StaticResource PaymentSumConverter}">
                                     <Binding.ValidationRules>
                                         <validation:PaymentSumValidationRule />
                                     </Binding.ValidationRules>
